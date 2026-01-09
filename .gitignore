@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+cmu_graphics/
+
+Files/
+
+!Files/words_alpha.txt
+
+.vscode/
+
+client/db/programs.db
