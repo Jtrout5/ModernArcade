@@ -167,6 +167,7 @@ def find_files_by_extension(directory, extension):
     '''
     found_files = []
     for root, dirs, files in os.walk(directory):
+        dirs[:] = [d for d in dirs if d!="cmu_graphics"]
         for file in files:
             _, file_extension = os.path.splitext(file)
             if file_extension.lower() == extension.lower():
@@ -308,7 +309,7 @@ def create_buttons_for_unknown_games():
         gamePath = unknownGames[i]
         data = gamePath[:-3]
         newButton = Rect(app.left + ((i+app.games)/4)*app.width, app.top, app.width/4,app.width/4, fill = 'gray', border = 'black')
-        newButton.game = gamePath
+        newButton.game = "../"+data+"/"+gamePath
         buttons.append(newButton)
         newLabel = Label("Launch "+ data, newButton.centerX, newButton.centerY, size = app.width/55, bold = True)
         gameLabels.add(newLabel)
