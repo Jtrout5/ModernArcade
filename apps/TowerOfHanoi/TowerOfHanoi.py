@@ -4,6 +4,7 @@ import subprocess
 import zipfile
 import shutil
 import math
+import json
 
 
 try:
@@ -71,6 +72,13 @@ app.minSize = (1/40)*width
 
 default = [0,0,0,0,0,3]
 keys = ["HighestTowerCompleted", "TotalTowersCompleted", "TimesReset", "TimesPerfect", "TimesLaunched", "HighestLevel"] 
+default_json = {
+        "left": [1,2,3],
+        "mid": [],
+        "right": [],
+        "level": 3,
+        "moves": 0
+    }
 fullInfoList = []
 allRods = Group()
 allDiscs = Group()
@@ -80,6 +88,11 @@ selectionLabels = Group()
 leftDiscs = [None]
 midDiscs = [None]
 rightDiscs = [None]
+savedLeft = []
+savedMid = []
+savedRight = []
+app.savedLevel = 3
+app.savedMoves = 0
 colors = ['red', 'yellow', 'blue']
 
 
@@ -95,11 +108,14 @@ def file_checking(path, default):
     properPath = os.path.join(directory, path)
     if(not os.path.exists(directory)):
         os.makedirs(directory, exist_ok=True)
-    if (not os.path.exists(properPath)):
+    if (not os.path.exists(properPath) and 'txt' in path):
         with open(properPath, 'w') as f:
             f.seek(0)
             for i in range(len(default)):
                 f.write((str)(default[i])+"\n")
+    if(not os.path.exists(properPath) and 'json' in path):
+        with open(properPath, 'w') as j:
+            json.dump(default_json, j, indent=4)
     if("Stats" in properPath):
         with open(properPath, "r+") as gameInfo:
             for thing in gameInfo:
@@ -115,10 +131,23 @@ def file_checking(path, default):
                     gameInfo.write((str)(fullInfoList[i])+"\n")
                     keysFile.seek(0,2)
                     keysFile.write(keys[i] + "\n")
-
+    if("Saved" in properPath):
+        with open(properPath, 'r+') as j:
+            saveDataAll = json.load(j)
+            app.savedMoves = saveDataAll['moves']
+            app.savedLevel = saveDataAll['level']
+            for i in range(len(saveDataAll['left'])):
+                savedLeft.insert(i, saveDataAll['left'][i])
+            for i in range(len(saveDataAll['mid'])):
+                savedMid.insert(i, saveDataAll['mid'][i])
+            for i in range(len(saveDataAll['right'])):
+                savedRight.insert(i, saveDataAll['right'][i])
+                
 file_checking(gameName+"Stats.txt", default)
 file_checking(gameName+"Keys.txt", keys)
+file_checking(gameName+"Saved.json", default_json)
 gameInfo = open("Files/TowerOfHanoiStats.txt", "r+")
+saveData = open("Files/TowerOfHanoiSaved.json", "r+")
 app.level = fullInfoList[5]
 app.absX = 0
 app.absY = 0
@@ -127,12 +156,16 @@ reset = Rect(0,0,width/15, height/20, fill='white', border = 'black')
 reset.name = Label("Reset Level", reset.centerX, reset.centerY)
 newLevel = Rect(width, 0, width/15, height/20, fill = 'white', border = 'black', align = 'top-right', visible = False)
 newLevel.name = Label("Next Level", newLevel.centerX, newLevel.centerY, visible = False)
-closeGameButton = Rect(width/2, 0, width/15, height/20, fill='white', border = 'black')
+closeGameButton = Rect(width/3, 0, width/15, height/20, fill='white', border = 'black')
 closeGameButton.name = Label("Close Game", closeGameButton.centerX, closeGameButton.centerY)
 backToLauncher = Rect(closeGameButton.left, closeGameButton.top, closeGameButton.width, closeGameButton.height, fill="white", border = 'black', align = 'top-right')
 backToLauncher.name = Label("Return to Launcher", backToLauncher.centerX, backToLauncher.centerY)
 backToLauncher.game = "PretendLauncher/PretendLauncher.py"
-selectLevel = Rect(2*width/3,0, width/15, height/20, fill='white', border = 'black', align = 'top-right')
+saveGameButton = Rect(2*width/3, 0, width/15, height/20, fill='white', border = 'black', align = 'top')
+saveGameButton.name = Label("Save Game", saveGameButton.centerX, saveGameButton.centerY)
+loadGameButton = Rect(saveGameButton.right, saveGameButton.top, width/15, height/20, fill='white', border = 'black')
+loadGameButton.name = Label("Load Saved Game", loadGameButton.centerX, loadGameButton.centerY)
+selectLevel = Rect(saveGameButton.left,0, width/15, height/20, fill='white', border = 'black', align = 'top-right')
 selectLevel.name = Label("Select Level", selectLevel.centerX, selectLevel.centerY)
 
 
@@ -163,14 +196,14 @@ def create_rod(x, discs):
     rod.topDisc = discs[0]
     return rod
 
-def create_ring(x, i, size):
-    ring = Rect(x, height-(app.ringHeight*i), size, app.ringHeight, fill = colors[i%3], align = 'bottom', border = 'black')
+def create_ring(x, i, size, origin):
+    ring = Rect(x, height-(app.ringHeight*i), size, app.ringHeight, fill = colors[i%3], align = 'bottom')
     ring.id = app.level-i
     ring.topLeft = False
     ring.topMid = False
     ring.topRight = False
     ring.canMove = False
-    ring.origin = 0
+    ring.origin = origin
     leftDiscs.insert(0,ring)
     return ring
 
@@ -202,7 +235,7 @@ def start_level():
     app.rightRod = create_rod(4*width/5, [None])
     allRods.add(app.leftRod, app.centerRod, app.rightRod)
     for i in range(app.level):
-        allDiscs.add(create_ring(app.leftRod.centerX, i, app.allowableSizes[i]))
+        allDiscs.add(create_ring(app.leftRod.centerX, i, app.allowableSizes[i], 0))
     for ring in allDiscs:
         if(ring.id == 1):
             ring.topLeft = True
@@ -218,6 +251,18 @@ def select_disc(disc):
         midDiscs.remove(disc)
     if disc in rightDiscs:
         rightDiscs.remove(disc)
+
+def save_to_json(filepath, leftDiscs, midDiscs, rightDiscs, level, moves):
+    # Build the data structure to save
+    data = {
+        "left": [disc.id for disc in leftDiscs if disc != None],
+        "mid": [disc.id for disc in midDiscs if disc != None],
+        "right": [disc.id for disc in rightDiscs if disc!=None],
+        "level": level,
+        "moves": moves
+    }
+    with open(filepath, "r+") as j:
+        json.dump(data, j, indent=4)
 
 def win():
     app.roundOver = True
@@ -236,6 +281,61 @@ def win():
     if((app.level+1)>fullInfoList[5]):
         fullInfoList[5] = app.level+1
     update_stats()  
+
+def load_from_save():
+    savedLeft.clear()
+    savedMid.clear()
+    savedRight.clear()
+    saveDataAll = json.load(saveData)
+    app.savedMoves = saveDataAll['moves']
+    app.savedLevel = saveDataAll['level']
+    for i in range(len(saveDataAll['left'])):
+        savedLeft.insert(i, saveDataAll['left'][i])
+    for i in range(len(saveDataAll['mid'])):
+        savedMid.insert(i, saveDataAll['mid'][i])
+    for i in range(len(saveDataAll['right'])):
+        savedRight.insert(i, saveDataAll['right'][i])
+    allDiscs.clear()
+    allDiscIDs = []
+    allRods.clear()
+    app.leftRod = create_rod(width/5, [None])
+    app.centerRod = create_rod(width/2, [None])
+    app.rightRod = create_rod(4*width/5, [None])
+    allRods.add(app.leftRod, app.centerRod, app.rightRod)
+    app.level = app.savedLevel
+    app.moveCount = app.savedMoves
+    for i in range(app.level):
+        allDiscIDs.append(i+1)
+    app.fakeRod = create_rod(width*2, allDiscIDs)
+    app.allowableSizes = []
+    app.ringHeight = (4*app.height//(5*app.level))
+    variance = (app.maxSize - app.minSize)/(app.level-1)
+    for i in range(app.level):
+        app.allowableSizes.append(app.maxSize-(variance*i))
+    for i in range(app.level):
+        allDiscs.add(create_ring(app.fakeRod.centerX, i, app.allowableSizes[i], None))
+    leftDiscs.clear()
+    leftDiscs.append(None)
+    midDiscs.clear()
+    midDiscs.append(None)
+    rightDiscs.clear()
+    rightDiscs.append(None)
+    for disc in allDiscs:
+        if(disc.id in savedLeft):
+            disc.centerX = app.leftRod.centerX
+            disc.centerY = app.leftRod.centerY
+            disc.origin = 0
+            snap_disc(disc)
+        elif(disc.id in savedMid):
+            disc.centerX = app.centerRod.centerX
+            disc.centerY = app.centerRod.centerY
+            disc.origin = 1
+            snap_disc(disc)
+        else:
+            disc.centerX = app.rightRod.centerX
+            disc.centerY = app.rightRod.centerY
+            disc.origin = 2
+            snap_disc(disc)
 
                 
     
@@ -288,6 +388,11 @@ def onMousePress(x,y):
         os.chdir("../")
         subprocess.Popen([sys.executable, backToLauncher.game])
         sys.exit(0)
+    elif(saveGameButton.contains(x,y)):
+        save_to_json("Files/TowerOfHanoiSaved.json", leftDiscs, midDiscs, rightDiscs, app.level, app.moveCount)
+    elif(loadGameButton.contains(x,y)):
+        fullInfoList[2]+=1
+        load_from_save()
         
             
 def update_stats():
