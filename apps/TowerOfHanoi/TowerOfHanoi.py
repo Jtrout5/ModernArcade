@@ -307,6 +307,7 @@ def load_from_save():
     app.rightRod = create_rod(4*width/5, [None])
     allRods.add(app.leftRod, app.centerRod, app.rightRod)
     app.level = app.savedLevel
+    app.perfectMoves = pow(2,app.level)-1
     app.moveCount = app.savedMoves
     for i in range(app.level):
         allDiscIDs.append(i+1)
