@@ -19,7 +19,7 @@ try:
     import pyautogui
     import requests
 except ImportError as e:
-    os.system("pip3 install -r requirements.txt")
+    os.system("pip3 install -r ../../libraries/requirements.txt")
     import pyautogui
     import requests
 
