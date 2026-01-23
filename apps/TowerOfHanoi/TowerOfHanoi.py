@@ -70,8 +70,8 @@ app.autofs = 0
 app.maxSize = (0.3)*width
 app.minSize = (1/40)*width
 
-default = [0,0,0,0,0,3]
-keys = ["HighestTowerCompleted", "TotalTowersCompleted", "TimesReset", "TimesPerfect", "TimesLaunched", "HighestLevel"] 
+default = [0,0,0,0,0,3,0]
+keys = ["HighestTowerCompleted", "TotalTowersCompleted", "TimesReset", "TimesPerfect", "TimesLaunched", "HighestLevel", "HighestPerfect"] 
 default_json = {
         "left": [1,2,3],
         "mid": [],
@@ -93,6 +93,7 @@ savedMid = []
 savedRight = []
 app.savedLevel = 3
 app.savedMoves = 0
+app.resetSaveProtection = True
 colors = ['red', 'yellow', 'blue']
 
 
@@ -272,6 +273,8 @@ def win():
     if(app.moveCount == app.perfectMoves):
         postGame.add(Label("That solution was perfect", width/2, height/10))
         fullInfoList[3]+=1
+        if(app.level>fullInfoList[6]):
+            fullInfoList[6] = app.level
     else:
         postGame.add(Label("That solution was not the best, and could have been completed in %d fewer moves" %(app.moveCount - app.perfectMoves), width/2, height/10)) 
     if(app.level>fullInfoList[0]):
@@ -283,6 +286,7 @@ def win():
     update_stats()  
 
 def load_from_save():
+    app.resetSaveProtection = True
     savedLeft.clear()
     savedMid.clear()
     savedRight.clear()
@@ -361,6 +365,7 @@ def onMousePress(x,y):
         for disc in allDiscs:
             if((disc == leftDiscs[0] or disc == midDiscs[0] or disc == rightDiscs[0]) and disc.contains(x,y)):
                 select_disc(disc)
+                app.resetSaveProtection = False
                 app.moveCount+=1
     if(len(selectionLabels)>0):
         for button in selectScreen:
@@ -381,9 +386,13 @@ def onMousePress(x,y):
     elif(selectLevel.contains(x,y)):
         level_select()
     elif(closeGameButton.contains(x,y)):
+        if(app.moveCount>0 and app.resetSaveProtection==False):
+            fullInfoList[2]+=1
         update_stats()
         sys.exit(0)
     elif(backToLauncher.contains(x,y)):
+        if(app.moveCount>0 and app.resetSaveProtection==False):
+            fullInfoList[2]+=1
         update_stats()
         os.chdir("../")
         subprocess.Popen([sys.executable, backToLauncher.game])
@@ -391,7 +400,8 @@ def onMousePress(x,y):
     elif(saveGameButton.contains(x,y)):
         save_to_json("Files/TowerOfHanoiSaved.json", leftDiscs, midDiscs, rightDiscs, app.level, app.moveCount)
     elif(loadGameButton.contains(x,y)):
-        fullInfoList[2]+=1
+        if(app.resetSaveProtection == False):
+            fullInfoList[2]+=1
         load_from_save()
         
             
@@ -487,6 +497,7 @@ def onMouseRelease(x,y):
 def onKeyPress(key):
     if(key=='escape' and len(selectionLabels)>0):
         selectionLabels.clear()
+        app.roundOver=False
 
 fullInfoList[4]+=1    
 selectScreen.toFront()
