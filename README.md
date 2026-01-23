@@ -1,23 +1,48 @@
 # Modern Arcade
 
 Project Author: Jeramiah Trout
+<details>
+<summary>Quick Information</summary>
+This repository hosts content which began as a group project for COMP 333, Software Engineering, at Wesleyan University. I have spun this repository off as a new personal project containing only the parts of the project I personally wrote, and will expand from that starting point. All content in this repository, except that which I specifically note as being sourced elsewhere, was created solely by me during the semester long group project. <br>
+In this readme, you will find info on installing python, as well as getting this project to run on your system. There are also detailed descriptions for each of the games included, and the video guide shows some of these games being played. As new games are added, there will be updates to the readme providing details on the new releases. Please enjoy.
+<br>
+I have personally tested each game on Windows and Mac devices and believe everything to be fully functional and bug free. However, if you find crashes, launch failures, or bugs in your play time, please submit a bug report on the github page for this repository. Thank you for taking the time to read this document and for showing your interest in my project.
 
-This repository hosts content which began as a group project for COMP 333, Software Engineering, at Wesleyan. I have spun this repository off as a new personal project containing only the parts of the project I personally wrote, and will expand from that starting point. This readme also acts as a user guide. 
 ________
+</details>
+<details>
+<summary> Getting Started </summary>
+<details>
+<summary>Python Installation</summary>
 
+# Python 3.14 is now supported!!!
 
-# Python 3.14 is not currently supported. Please use Python 3.13*
+You may download the most recent release of Python 3.14 (3.14.2) at https://www.python.org/downloads/release/python-3142/ and then navigate to your specific platform and download the installer from there. I personally recommend scrolling all the way down to the files portion of the site and downloading the recommended installer directly instead of the using the install manager as the manager introduced some annoyance. After the download is complete, open the installer, and click "Install Now" or "Upgrade" (Upgrade is only available if you have an older release of the same version). Once installation is complete, you can use the rest of this guide to get started.
+</details>
 
-*You may download Python 3.13.11 at https://www.python.org/downloads/release/python-31311/ and then navigating to your specific platform and downloading the installer.
+<details>
+<summary>Graphics Installtion</summary>
 
+## Graphics Package (Now Installed Automatically on First Launch)
 
-This project is built using the CMU graphics library which can be found at https://academy.cs.cmu.edu/desktop. The December 8th update now installs the graphics package for you on your 1st running of the pretend launcher or any game. If this process fails (which should not happen), then you should follow the above link, download the package as a zip, extract/expand, and then copy the cmu_graphics folder from the cmu_graphics_installer folder, and place it into the libraries folder of the project directory.
+This project is built using the CMU graphics library which can be found at https://academy.cs.cmu.edu/desktop. The December 8th update to this project now installs the most updated version of the graphics package for you on your 1st running of the pretend launcher or any game. If this process fails (which should not happen), then you should follow the above link, download the package as a zip, extract/expand, and then copy the cmu_graphics folder from the cmu_graphics_installer folder, and place it into the libraries folder of the project directory. It is important to only copy and move the cmu_graphics folder, not the entire cmu_graphics_installer folder. If future versions of this package release, you can delete the cmu_graphics folder from the libraries directory in this repository and then run any game or the launcher itself and the newest version will automatically be installed.
+</details>
+
+<details>
+<summary>Launching the Project</summary>
 
 # How to play
 
-You can find a short video demo on YouTube at https://youtu.be/CQykV8IK4Tk. Note that it does not cover all of the games but shows a decent subset of the games and mechanics as well as a general guide for starting from the download to running the launcher. However, if you would prefer written step by step instructions from download to running, read below
+You can find a short video demo on YouTube at https://youtu.be/CQykV8IK4Tk. Note that it does not cover all of the games but shows a decent subset of the games and mechanics as well as a general guide for starting from the download to running the launcher. However, if you would prefer written step by step instructions from download to running, read below. 
+<br >
 
-Regardless of platform, please download or clone this entire project repository from the "main" branch. This can be accomplished by navigting to the main branch, and then clicking the green "code" button and either downloading as zip or copying the shown link and cloning via your favorite IDE with git cloning functionality, such as VS Code. Running any of the games or the Pretend Launcher will install all dependencies, though you may need to allow certain bits of access and control, but these should come up automatically if applicable.
+Regardless of platform, please download or clone this entire project repository from the "main" branch. This can be accomplished by navigating to the main branch, and then clicking the green "code" button and either downloading as zip or copying the shown link and cloning via your favorite IDE with git cloning functionality, such as VS Code. Running any of the games or the Pretend Launcher will install all dependencies, though you may need to allow certain bits of access and control, but these popups should come up automatically if applicable.
+<br>
+
+You will find platform specific information below
+
+<details>
+<summary>MacOs</summary>
 
 ## MacOS Instructions for PretendLauncher.py
 If you are on MacOS, you have 3 options for running the launcher:
@@ -26,7 +51,7 @@ If you are on MacOS, you have 3 options for running the launcher:
 or  
 2. Open in Python Launcher (NOT IDLE) and run the script  
 or  
-3. Open a terminal window, navigate to the directory the launcher is in and run the launcher. Note that the launcher is in 333Arcade/apps/PretendLauncher, so you will have to navigate to the location you placed this repository*
+3. Open a terminal window, navigate to the directory the launcher is in and run the launcher. Note that the launcher is in ModernArcade/apps/PretendLauncher, so you will have to navigate to the location you placed this repository first*
 
 
 ```bash
@@ -36,7 +61,7 @@ python3 PretendLauncher.py
 ```
 Note that if you have multiple versions of python3 installed, (such as 3.6.4, 3.9.3, 3.13.7, 3.14.2), you may need to specify version in your command as shown below:
 
-To check installed version, simply run 
+To check installed versions, simply run 
 
 ```bash
 which -a python3
@@ -55,6 +80,9 @@ cd apps/PretendLauncher
 python3.13 PretendLauncher.py
 ```
 ____
+</details>
+<details>
+<summary> Windows </summary>
 
 ## Windows Instructions for PretendLauncher.py
 
@@ -62,23 +90,24 @@ If you are on Windows you have 2 simple options to run the launcher:
 
 1. Double click the PretendLauncher.py file as if it were an executable  
 or  
-2. Open the repository folder through VS code and click the play button at the top right while having the launcher file selected
+2. Open the repository folder through VS code and click the play button at the top right while having the launcher file selected <br>
 or
 3. Open command prompt and navigate to the directory PretendLauncher.py is stored in, type "python3 PretendLauncher.py" and press Enter
 ____
 
-
-# Included in this Repository
-
-## libraries
-
-#### This folder will come populated with a slightly altered version of the words_alpha.txt file available at https://github.com/dwyl/english-words/blob/master/words_alpha.txt. The alterations are just the removal of words that are 4 letters or fewer, but you can feel free to look at the source or replace the file attached in this repository with that file instead. Upon running the launcher or any game, the libraries folder will become populated with the cmu_graphics package via an automatic download if it was not already added manually by the user. libraries also contains the Audio Folder. This folder comes populated with mp3 files used in some of the games. Deleting this folder or files within the folder may cause game crashes as audio files are attempted to be played. Additionally, there is a Thumbnails folder containing images used to represent games via the Pretend Lancher. Finally, there is a txt file called requirements.txt containing a list of required installations for the project to run. These packages will be installed upon running the Pretend Launcher or one of the games.
-
-## Launcher
+</details>
+</details>
+</details>
 
 <details>
+<summary> Extra Information</summary>
+
+## Launcher
+<details>
 <summary>PretendLauncher.py</summary>
-This file acts as the launcher file for all of the games released with this project. It will make and maintain stats and key files for all of the included games. If you wish to know what stats are kept, you may check the keys files which should make it clear what game events are being tracked. In an upcoming release planned for November 7th, 2025, you will be able to automatically delete and recreate the stats files, or update them to match new game updates without necessitating the manual deletion of the files in the Files folder.
+This file acts as the launcher file for all of the games released with this project. It will make and maintain stats and key files for all of the included games. If you wish to know what stats are kept, you may check the keys files which should make it clear what game events are being tracked. 
+
+<br>
 
 If you delete the files or the entire Files folder, then the launcher will remake the files the next time it is run. The files are necessary for the games to work, and the games will crash on launch if the files are missing. This is solved by running the launcher again. If you delete the stats file for a specific game, your progress is erased for that game (or all games if you delete the Files folder)
 </details>
@@ -121,13 +150,18 @@ This game is the standard minesweeper experience. You select a difficulty and cl
 
 <details>
 <summary>MissileCommand.py</summary>
-Basic Information: This is a modern remake of an arcade game, Missile Command. In this game, you control 3 missile batteries tasked with protecting 6 cities during an overnight attack. If you wish to manually switch which missile battery you are controlling at any time, you may do so by using the left and right arrow keys. Additionally, upon firing, the game will automatically select the next missile battery in rotation. You shoot by clicking your mouse on the screen at the place you want to fire a missile towards. The missile will fire from whichever missile battery you have selected, which will be outlined in white. Once reaching its target destination, your missile will explode and the explosion will remain for a few seconds as a fireball, able to destroy incoming enemies, allowing you to score. If you hit an enemy with a missile directly, instead of via the explosion, you will earn a 5x score bonus
+Basic Information: This is a modern remake of an arcade game, Missile Command. In this game, you control 3 missile batteries tasked with protecting 6 cities during an overnight attack. If you wish to manually switch which missile battery you are controlling at any time, you may do so by using the left and right arrow keys. Additionally, upon firing, the game will automatically select the next missile battery in rotation. You shoot by clicking your mouse on the screen at the place you want to fire a missile towards. The missile will fire from whichever missile battery you have selected, which will be outlined in white. Once reaching its target destination, your missile will explode and the explosion will remain for a few seconds as a fireball, able to destroy incoming enemies, allowing you to score. If you hit an enemy with a missile directly, instead of via the explosion, you will earn a 5x score bonus. 
 
-More Gameplay: Each missile battery must reload after firing, and it has its own ammo which cannot be moved to other missile batteries. If an enemy hits any missile battery, it is damaged for a set amount of time and cannot fire or be selected during that time. This damaged state will result in a red highlight around the missile battery. This damage time is determined based on the type of enemy which caused the damage. Repair time after a large enemy hit is 25 seconds, and repair time after a small enemy hit is 10 seconds. This time is cumulative, meaning that subsequent hits extend repair time. This a a change from the original aracde game, where a single hit to a missile battery resulted in total destruction of the missile battery for the level, with repair immediate upon survival of the level. In order to balance this feature of repair time instead of destruction, repair time will carry over between levels. If a large enemy hits a city, it is immediately destroyed in its entirety. If a small enemy hits a city, the building(s) hit by the small enemy will be destroyed and the city overall will take damage. If the city takes damage in this way 3 times, it will be wholly destroyed. You will receive extra ammo each level, on top of the ammo you retained, but the number of enemies scales faster than the ammount of new ammo granted at later levels, so pick your targets carefully, and keep as much ammo as possible. All enemies can be destroyed in 1 shot
+<br>
+
+More Gameplay: Each missile battery must reload after firing, and it has its own ammo which cannot be moved to other missile batteries. If an enemy hits any missile battery, it is damaged for a set amount of time and cannot fire or be selected during that time. This damaged state will result in a red highlight around the missile battery. This damage time is determined based on the type of enemy which caused the damage. Repair time after a large enemy hit is 25 seconds, and repair time after a small enemy hit is 10 seconds. This time is cumulative, meaning that subsequent hits extend repair time. This a a change from the original aracde game, where a single hit to a missile battery resulted in total destruction of the missile battery for the level, with repair immediate upon survival of the level. In order to balance this feature of repair time instead of destruction, repair time will carry over between levels. If a large enemy hits a city, it is immediately destroyed in its entirety. If a small enemy hits a city, the building(s) hit by the small enemy will be destroyed and the city overall will take damage. If the city takes damage in this way 3 times, it will be wholly destroyed. You will receive extra ammo each level, on top of the ammo you retained, but the number of enemies scales faster than the ammount of new ammo granted at later levels, so pick your targets carefully, and keep as much ammo as possible. All enemies can be destroyed in 1 shot.
+<br >
 
 Enemies: You will face tougher enemies as you advance in the game. You begin by defending against basic missiles will travel directly down and with a constant speed. The next enemy type is a bomber plane which will drop bombs across the map, but can be destroyed before dropping all bombs. The next enemy type are missiles with horizontal velocity which are affected by gravity, so they will move faster as they travel. The next enemy is a "multi-bomb" which will explode well above the ground and launch multiple smaller bombs, but it can be destroyed before reaching that unknown height. The next enemy is a smart missile which will manuever to avoid fireballs. It is affected by gravity and will speed up as it falls, and has limited angles to avoid fireballs, but it is best to try and hit this enemy directly or nearly directly. The final enemy type is the UFO. You absolutely can not afford to let this enemy reach the space above your middle missile battery, because it will launch devestating strikes of smaller bombs towards your cities and missile batteries. This is the most dangerous enemy and should be your primary target if you spot one. 
+<br >
 
 There are certain score milestones which enable you to unlock bonus cities, which will replace a destroyed city at the start of the next level in the event that you were unable to protect it. Bonus cities will only spawn if you survived the level, by keeping at least one city alive. Since you gain points for destruction, including a 5x muliplier on direct hit, and bonus points for unspent ammo, and cities kept alive, you will earn bonus cities faster the better you are at the game. Cities will spawn at the start of a new level if you ahve space for a new city. If ypu do not have space, you will retain your bonus city until you reach the start of a level and have space for the city. Bonus cities stack, so it is possible to have several bonus cities, and therfore multiple cities created at the start of a level. There is no win condition for this game, as eventually, you will be unable to protect all of your cities, despite your best efforts.
+<br >
 
 Allied flak gunners have arrived to support the play in the Nov 24 2025 update, each city building has an operational flak gun which will automatically take aim and target incoming enemies. They have an incredible rate of fire, tempered by a lack of accuracy, but they can deal serious damgage. It would be unwise to rely soley on the flak gunners, but they are valuable teammates capable of destroying each type of enemy projectile if they are lucky enough to make contact. They can even provide cover for player missile batteries and save the player from an exposion causing damage and increasing the delay for repairs. Projectiles destroyed my the flak gunners also count towards player score.
 </details>
@@ -152,4 +186,28 @@ This is a digital recreation of the Tower Of Hanoi Puzzle, where you must move r
 This game is a simple typing exercise in typing ability, as words move from left to right across the screen and it is the players job to type the words correctly. As you go on a streak, your score multiplier will increase which also leads to a higher frequency of word spawns. It is impossible to get every word, and that's why you are not severely penalized for words getting passed you. Depending on your multiplier, after a certain number of words pass by without you typing a correct word, your multiplier will decrease. Be careful, because typing an incorrect word will drop the muliplier by a lot more and reset your streak. The game is played using the keyboard to type the words. Your current typed word appears at the top of the screen, and you press enter to submit. Backspace works as expected, where 1 press deletes the most recent letter only.
 </details>
 
+## Extra Files
 
+<details>
+<summary>libraries</summary>
+This is the folder that will be accessed by all of the games and the launcher for purposes of audio, text, and images, as well as to obtain the list of required packages to be installed, found in a txt file called requirements.txt. These packages will be installed upon running the Pretend Launcher or one of the games. More explicit definitions of included items are listed below
+<details>
+<summary>words_alpha.txt</summary>
+This folder will come populated with a slightly altered version of the words_alpha.txt file available at https://github.com/dwyl/english-words/blob/master/words_alpha.txt. The alterations are just the removal of words that are 4 letters or fewer, but you can feel free to look at the source or replace the file attached in this repository with that file instead. 
+</details>
+<details>
+<summary>Graphics</summary>
+Upon running the launcher or any game, the libraries folder will become populated with the cmu_graphics package via an automatic download if it was not already added manually by the user. This will take some time, depending on the speed of your internet, but it is a one time install. All subsequent launches will be instant. This graphics package was developed and is currently maintained by students at Carnegie Mellon University.
+</details>
+
+<details>
+<summary>Audio</summary>
+This folder comes populated with mp3 files used in some of the games. Deleting this folder or files within the folder may cause game crashes as audio files are attempted to be played. These files were made by using free audio available online through open license and through garage band built in sounds. Each game containing audio can have that audio muted by pressing the m key while in game.
+</details>
+
+<details>
+<summary>Thumbnails</summary>
+ Additionally, there is a Thumbnails folder containing images used to represent games via the Pretend Launcher. These are images captures as screenshots from in game, with only minimal editing to remove menus and UI elements like score counters and settings buttons. The screenshots were then sized down from 8k to 400x400 pixels such that they could be used on the game buttons in the launcher without causing lag on lower end hardware.
+</details>
+</details>
+</details>
