@@ -291,7 +291,7 @@ def load_from_save():
     savedMid.clear()
     savedRight.clear()
     saved = open("Files/TowerOfHanoiSaved.json")
-    saveDataAll = json.load(saveData)
+    saveDataAll = json.load(saved)
     app.savedMoves = saveDataAll['moves']
     app.savedLevel = saveDataAll['level']
     for i in range(len(saveDataAll['left'])):
