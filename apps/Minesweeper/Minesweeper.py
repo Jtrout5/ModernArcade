@@ -62,6 +62,7 @@ height = size[1]
 
 app.autofs = 0
 app.queuedUnlockCall = []
+app.muted = False
 
 default = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 keys = ["WonEasy", "AttemptedEasy", "WonMedium", "AttemptedMedium", "WonHard", "AttemptedHard" ,"WonTotal", "AttemptedTotal", "Achievement1", "FlagsUsed", "TimesLaunched", "WonCrazy", "AttemptedCrazy"]
@@ -657,7 +658,18 @@ def toggle_help():
         app.help = False
         helpMenu.clear()
         escapeButtons.clear()
-            
+
+
+def toggle_mute():
+    '''
+    Takes no args and returns no values
+    When called, if sound is on, it will mute audio
+    Else, sound will turn on
+    '''
+    if(app.muted == True):
+        app.muted = False
+    else:
+        app.muted = True  
         
 def onKeyPress(key):
     '''
@@ -676,6 +688,8 @@ def onKeyPress(key):
         toggle_flags_color()
     if((key == 'h' or key == 'H' or key =='p' or key =='P') and app.mode != None):
         toggle_help()
+    if(key == 'm' or 'M'):
+        toggle_mute()
 
 def clean_pre_game():
     '''
@@ -749,7 +763,8 @@ def onStep():
         pyautogui.keyUp("command")
         pyautogui.keyUp("ctrl")
     if(app.failed == True and app.mode!=None):
-        app.boom.play()
+        if(app.muted == False):
+            app.boom.play()
         explode_bombs()
     if(app.achShowing == True):
         app.removeAchTimer-=1
