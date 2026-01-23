@@ -290,6 +290,7 @@ def load_from_save():
     savedLeft.clear()
     savedMid.clear()
     savedRight.clear()
+    saved = open("Files/TowerOfHanoiSaved.json")
     saveDataAll = json.load(saveData)
     app.savedMoves = saveDataAll['moves']
     app.savedLevel = saveDataAll['level']
