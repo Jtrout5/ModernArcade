@@ -3,6 +3,8 @@ import sys
 import subprocess
 import zipfile
 import shutil
+import math
+
 
 try:
     import pyautogui
@@ -55,7 +57,6 @@ except ImportError as e:
     shutil.rmtree("../../libraries/cmu_graphics_installer")
     from cmu_graphics import *
 
-
 size = pyautogui.size()
 width = size[0]
 height = size[1]
@@ -74,6 +75,8 @@ fullInfoList = []
 allRods = Group()
 allDiscs = Group()
 postGame = Group()
+selectScreen = Group()
+selectionLabels = Group()
 leftDiscs = [None]
 midDiscs = [None]
 rightDiscs = [None]
@@ -129,6 +132,8 @@ closeGameButton.name = Label("Close Game", closeGameButton.centerX, closeGameBut
 backToLauncher = Rect(closeGameButton.left, closeGameButton.top, closeGameButton.width, closeGameButton.height, fill="white", border = 'black', align = 'top-right')
 backToLauncher.name = Label("Return to Launcher", backToLauncher.centerX, backToLauncher.centerY)
 backToLauncher.game = "PretendLauncher/PretendLauncher.py"
+selectLevel = Rect(2*width/3,0, width/15, height/20, fill='white', border = 'black', align = 'top-right')
+selectLevel.name = Label("Select Level", selectLevel.centerX, selectLevel.centerY)
 
 
 def onStep():
@@ -170,6 +175,8 @@ def create_ring(x, i, size):
     return ring
 
 def start_level():
+    selectScreen.clear()
+    selectionLabels.clear()
     app.perfectMoves = pow(2,app.level) - 1
     newLevel.visible = False
     newLevel.name.visible = False
@@ -216,7 +223,7 @@ def win():
     app.roundOver = True
     newLevel.visible = True
     newLevel.name.visible = True
-    postGame.add(Label("You solved the %d disc version of the Tower of Hanor puzzle in %d moves" %(app.level, app.moveCount), width/2, height/20))
+    postGame.add(Label("You solved the %d disc version of the Tower of Hanor puzzle in %d moves" %(app.level, app.moveCount), width/2, height/16))
     if(app.moveCount == app.perfectMoves):
         postGame.add(Label("That solution was perfect", width/2, height/10))
         fullInfoList[3]+=1
@@ -225,9 +232,12 @@ def win():
     if(app.level>fullInfoList[0]):
         fullInfoList[0]=app.level 
     fullInfoList[1]+=1
+    app.moveCount = 0
+    if((app.level+1)>fullInfoList[5]):
+        fullInfoList[5] = app.level+1
     update_stats()  
 
-    
+                
     
 def check_win():
     countMid = 0
@@ -243,7 +253,6 @@ def check_win():
     if(countMid==app.level or countRight == app.level and app.roundOver == False):
         win()
             
-            
          
 def onMousePress(x,y):
     app.absX = x
@@ -253,19 +262,28 @@ def onMousePress(x,y):
             if((disc == leftDiscs[0] or disc == midDiscs[0] or disc == rightDiscs[0]) and disc.contains(x,y)):
                 select_disc(disc)
                 app.moveCount+=1
+    if(len(selectionLabels)>0):
+        for button in selectScreen:
+            if(button.contains(x,y) and button.id != None):
+                if(app.moveCount>0):
+                    fullInfoList[2]+=1
+                app.level = button.id
+                start_level()
     if(reset.contains(x,y)):
         if(app.roundOver == False):
             fullInfoList[2]+=1
         start_level()
-    if(newLevel.visible == True and newLevel.contains(x,y)):
+    elif(newLevel.visible == True and newLevel.contains(x,y)):
         app.level+=1
         if(app.level>fullInfoList[5]):
             fullInfoList[5] = app.level
         start_level()
-    if(closeGameButton.contains(x,y)):
+    elif(selectLevel.contains(x,y)):
+        level_select()
+    elif(closeGameButton.contains(x,y)):
         update_stats()
         sys.exit(0)
-    if(backToLauncher.contains(x,y)):
+    elif(backToLauncher.contains(x,y)):
         update_stats()
         os.chdir("../")
         subprocess.Popen([sys.executable, backToLauncher.game])
@@ -328,13 +346,25 @@ def snap_disc(disc):
         rightDiscs.insert(0,disc)
         app.moveCount-=1
 
+def level_select():
+    app.roundOver = True
+    back = Rect(0,0,width,height, fill='white')
+    back.id = None
+    selectScreen.add(back)
+    h = math.ceil(((math.sqrt(fullInfoList[5]-2))))
+    for i in range(3,fullInfoList[5]+1,1):
+        newRect = Rect(((width//h)*((i-3)%h)) + (width/2)//h, ((height/h)*((i-3)//h)) + (height/2)//h, width/h, height/h, fill = 'white', border = 'black', align = 'center')
+        newRect.id = i
+        selectScreen.add(newRect)
+        selectionLabels.add(Label(i, ((width//h)*((i-3)%h)) + (width/2)//h, ((height/h)*((i-3)//h)) + (height/2)//h, size = ((width/2)// h)))
+        
 def onMouseRelease(x,y):
     app.absX = x
     app.absY = y
     for disc in allDiscs:
         if(disc.canMove == True):
             snap_disc(disc)
-        disc.border = 'black'
+        disc.border = disc.fill
         disc.canMove = False
         if(disc == leftDiscs[0]):
             disc.topLeft = True
@@ -349,7 +379,13 @@ def onMouseRelease(x,y):
     check_win()
     update_stats()
 
+def onKeyPress(key):
+    if(key=='escape' and len(selectionLabels)>0):
+        selectionLabels.clear()
+
 fullInfoList[4]+=1    
+selectScreen.toFront()
+selectionLabels.toFront()
 start_level()
 
 
