@@ -72,8 +72,8 @@ app.slider = False
 app.dragSpeed = (1/80)*width
 
 unknownStats = Group()
-knownGames = ["Asteroids.py", "ColorGame.py", "Fireworks.py", "Hangman.py", "Minesweeper.py", "SubGame.py", "MissileCommand.py", "FlappyBat.py", "Simon.py", "Typespeed.py"]
-thumbnails = ["../../libraries/Thumbnails/AsteroidsImage.png", "../../libraries/Thumbnails/ColorGameImage.png", "../../libraries/Thumbnails/FireworksImage.png", "../../libraries/Thumbnails/FlappyBatImage.png", "../../libraries/Thumbnails/HangmanImage.png", "../../libraries/Thumbnails/MinesweeperImage.png", "../../libraries/Thumbnails/MissileCommandImage.png", "../../libraries/Thumbnails/SimonImage.png", "../../libraries/Thumbnails/SubGameImage.png", "../../libraries/Thumbnails/TypespeedImage.png"]
+knownGames = ["Asteroids.py", "ColorGame.py", "Fireworks.py", "Hangman.py", "Minesweeper.py", "SubGame.py", "MissileCommand.py", "FlappyBat.py", "Simon.py", "TowerOfHanoi.py", "Typespeed.py"]
+thumbnails = ["../../libraries/Thumbnails/AsteroidsImage.png", "../../libraries/Thumbnails/ColorGameImage.png", "../../libraries/Thumbnails/FireworksImage.png", "../../libraries/Thumbnails/FlappyBatImage.png", "../../libraries/Thumbnails/HangmanImage.png", "../../libraries/Thumbnails/MinesweeperImage.png", "../../libraries/Thumbnails/MissileCommandImage.png", "../../libraries/Thumbnails/SimonImage.png", "../../libraries/Thumbnails/SubGameImage.png", "../../libraries/Thumbnails/TowerOfHanoiImage.png", "../../libraries/Thumbnails/TypespeedImage.png"]
 images = Group()
 unknownGames = []
 
@@ -126,6 +126,11 @@ SimonKeys = ["HighScore", "GamesPlayed", "TimesLaunched"]
 SimonDisplay = ["High Score"]
 SimonStatsDisplay = []
 SimonInfoFull = [0,0,0]
+TowerOfHanoiDefault = [0,0,0,0,0,3,0]
+TowerOfHanoiKeys = ["HighestTowerCompleted", "TotalTowersCompleted", "TimesReset", "TimesPerfect", "TimesLaunched", "HighestLevel", "HighestPerfect"] 
+TowerOfHanoiDisplay = ["Highest Completed Solution", "Total Perfect Solutions", "Highest Perfect Solution"] 
+TowerOfHanoiStatsDisplay = []
+TowerOfHanoiInfoFull = [0,0,0,0,0,3,0]
 TypespeedDefault = [0,0,0,0,0,0,0]
 TypespeedKeys = ["WordsTyped", "LongestStreak", "HighScore", "GamesPlayed", "TimesLaunched", "WordsMissed", "Mistakes"]
 TypespeedDisplay = ["High Score", "Words Typed", "Longest Streak"]
@@ -220,7 +225,7 @@ displays = []
 realKeys = []
 statsDisplay = []
 
-tempList = [SubGameStatsDisplay, HangmanStatsDisplay, MinesweeperStatsDisplay, FireworksStatsDisplay, ColorGameStatsDisplay, AsteroidsStatsDisplay, MissileCommandStatsDisplay, FlappyBatStatsDisplay, SimonStatsDisplay, TypespeedStatsDisplay]
+tempList = [SubGameStatsDisplay, HangmanStatsDisplay, MinesweeperStatsDisplay, FireworksStatsDisplay, ColorGameStatsDisplay, AsteroidsStatsDisplay, MissileCommandStatsDisplay, FlappyBatStatsDisplay, SimonStatsDisplay, TowerOfHanoiStatsDisplay, TypespeedStatsDisplay]
 
 def accuracy_check(indexYes, indexTotal, source, destination, destIndex):
     '''
@@ -289,6 +294,7 @@ AsteroidsStatsDisplay+=[0, AsteroidsInfoFull[2]]
 MissileCommandStatsDisplay+=[MissileCommandInfoFull[0], MissileCommandInfoFull[4], 0, MissileCommandInfoFull[5], MissileCommandInfoFull[7]]
 FlappyBatStatsDisplay+=[FlappyBatInfoFull[8], find_favorite_game_mode_flappy_bat(), (0 if FlappyBatInfoFull[9]==0 else FlappyBatInfoFull[9]/FlappyBatInfoFull[1])]
 SimonStatsDisplay+=[SimonInfoFull[0]]
+TowerOfHanoiStatsDisplay+=[TowerOfHanoiInfoFull[0], TowerOfHanoiInfoFull[3], TowerOfHanoiInfoFull[6]]
 TypespeedStatsDisplay+=[TypespeedInfoFull[2], TypespeedInfoFull[0], TypespeedInfoFull[1]]
 ## Simple Stats
 
