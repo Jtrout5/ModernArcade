@@ -254,7 +254,6 @@ def select_disc(disc):
         rightDiscs.remove(disc)
 
 def save_to_json(filepath, leftDiscs, midDiscs, rightDiscs, level, moves):
-    # Build the data structure to save
     data = {
         "left": [disc.id for disc in leftDiscs if disc != None],
         "mid": [disc.id for disc in midDiscs if disc != None],
@@ -262,6 +261,7 @@ def save_to_json(filepath, leftDiscs, midDiscs, rightDiscs, level, moves):
         "level": level,
         "moves": moves
     }
+    open(filepath, "w").close() ## erases file. fixes json formatting bug and game crash
     with open(filepath, "r+") as j:
         json.dump(data, j, indent=4)
 
@@ -272,21 +272,26 @@ def win():
     postGame.add(Label("You solved the %d disc version of the Tower of Hanor puzzle in %d moves" %(app.level, app.moveCount), width/2, height/16))
     if(app.moveCount == app.perfectMoves):
         postGame.add(Label("That solution was perfect", width/2, height/10))
-        fullInfoList[3]+=1
+        if(app.resetSaveProtection == False):
+            fullInfoList[3]+=1
         if(app.level>fullInfoList[6]):
             fullInfoList[6] = app.level
     else:
         postGame.add(Label("That solution was not the best, and could have been completed in %d fewer moves" %(app.moveCount - app.perfectMoves), width/2, height/10)) 
     if(app.level>fullInfoList[0]):
         fullInfoList[0]=app.level 
-    fullInfoList[1]+=1
-    app.moveCount = 0
+    if(app.resetSaveProtection == False):
+            fullInfoList[1]+=1
+    else:
+        postGame.add(Label("This solution was created in full from a save and your stats will not reflect this solution", width/2, height/7))
+    
     if((app.level+1)>fullInfoList[5]):
         fullInfoList[5] = app.level+1
     update_stats()  
 
 def load_from_save():
     app.resetSaveProtection = True
+    postGame.clear()
     savedLeft.clear()
     savedMid.clear()
     savedRight.clear()
@@ -309,7 +314,6 @@ def load_from_save():
     allRods.add(app.leftRod, app.centerRod, app.rightRod)
     app.level = app.savedLevel
     app.perfectMoves = pow(2,app.level)-1
-    app.moveCount = app.savedMoves
     for i in range(app.level):
         allDiscIDs.append(i+1)
     app.fakeRod = create_rod(width*2, allDiscIDs)
@@ -342,7 +346,8 @@ def load_from_save():
             disc.centerY = app.rightRod.centerY
             disc.origin = 2
             snap_disc(disc)
-
+    app.roundOver = False
+    app.moveCount = app.savedMoves
                 
     
 def check_win():
