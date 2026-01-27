@@ -190,6 +190,10 @@ def onStep():
             
         
 def create_rod(x, discs):
+    '''
+    Takes 2 args, x which is a horizontal center location and discs which is an int list of disc ids to be on the rod
+    returns the rod object
+    '''
     rod = Group()
     center = Rect(x,height,width//75, 4*(height//5), align = 'bottom')
     top = Circle(center.centerX, center.top, center.width/2)
@@ -198,6 +202,15 @@ def create_rod(x, discs):
     return rod
 
 def create_ring(x, i, size, origin):
+    '''
+    Takes 4 args
+    x: horizontal center location
+    i: int id for the ring (also used for the vertical positioning indirectly)
+    size: width of the ring
+    origin: int corresponding to the rod which the ring is being placed, its origin for movement later
+    
+    returns ring shape
+    '''
     ring = Rect(x, height-(app.ringHeight*i), size, app.ringHeight, fill = colors[i%3], align = 'bottom')
     ring.id = app.level-i
     ring.topLeft = False
@@ -209,6 +222,11 @@ def create_ring(x, i, size, origin):
     return ring
 
 def start_level():
+    '''
+    Takes no args and returns no values
+    Uses helpers to set the game to the beginning of whatever level is specified by global variable
+    '''
+
     selectScreen.clear()
     selectionLabels.clear()
     app.perfectMoves = pow(2,app.level) - 1
@@ -244,6 +262,10 @@ def start_level():
     update_stats()
         
 def select_disc(disc):
+    '''
+    Takes 1 arg, disc, which is a disc object and makes alterations to its storage location and color characteristics
+    '''
+    
     disc.border = 'lime'
     disc.canMove = True
     if disc in leftDiscs:
@@ -254,6 +276,15 @@ def select_disc(disc):
         rightDiscs.remove(disc)
 
 def save_to_json(filepath, leftDiscs, midDiscs, rightDiscs, level, moves):
+    '''
+    Takes 5 args
+    :param filepath: Path to json file to be written to
+    :param leftDiscs: list of discs on the left rod
+    :param midDiscs: list of discs on the center rod
+    :param rightDiscs: list of discs on the right rod
+    :param level: int representing the current level
+    :param moves: int representing the number of moves the player made to get to this point
+    '''
     data = {
         "left": [disc.id for disc in leftDiscs if disc != None],
         "mid": [disc.id for disc in midDiscs if disc != None],
@@ -266,6 +297,10 @@ def save_to_json(filepath, leftDiscs, midDiscs, rightDiscs, level, moves):
         json.dump(data, j, indent=4)
 
 def win():
+    '''
+    Takes no args and returns no values but does display certain values and messages visually
+    Should only be called if the player has won the game
+    '''
     app.roundOver = True
     newLevel.visible = True
     newLevel.name.visible = True
@@ -290,6 +325,12 @@ def win():
     update_stats()  
 
 def load_from_save():
+    '''
+    Takes no args and returns no values
+    Reads save data from the data stored in json format
+    Updates variables to match the stored data and ensures that the rings are located correctly, moves are correct, and level is correct
+    Removes game objects and data from before the load to ensure no crashes or unexpected behavior
+    '''
     app.resetSaveProtection = True
     postGame.clear()
     savedLeft.clear()
@@ -351,6 +392,11 @@ def load_from_save():
                 
     
 def check_win():
+    '''
+    Takes no args and returns no values
+    Counts the number of rings on each rod and checks if one rod (not left) contains all of the rings
+    If that conidition is met, triggers win()
+    '''
     countMid = 0
     countRight = 0
     if(len(midDiscs)==app.level+1):
@@ -366,6 +412,10 @@ def check_win():
             
          
 def onMousePress(x,y):
+    '''
+    Built in CMU function taking the coordinates of a mouse press as arguments
+    Used in this game to save and load data, select levels, close the game, and to select discs to be moved
+    '''
     app.absX = x
     app.absY = y
     if(app.roundOver == False):
@@ -422,11 +472,19 @@ def update_stats():
         gameInfo.write((str)(fullInfoList[i])+"\n")
 
 def onMouseDrag(x,y):
+    '''
+    Built in CMU function which takes the coordinates of the mouse as it is dragged as arguments
+    Used in this game to update values used to control the motion of rings
+    '''
     app.absX = x
     app.absY = y
 
 
 def snap_disc(disc):
+    '''
+    takes 1 arg, disc, which is a disc object and returns no values
+    Calculates which rod the disc should be snapped onto, as well as the relative height of that snap
+    '''
     distLeft = distance(disc.centerX, disc.centerY, app.leftRod.centerX, app.leftRod.top)
     distMid = distance(disc.centerX, disc.centerY, app.centerRod.centerX, app.centerRod.top)
     distRight = distance(disc.centerX, disc.centerY, app.rightRod.centerX, app.rightRod.top)
@@ -469,6 +527,11 @@ def snap_disc(disc):
         app.moveCount-=1
 
 def level_select():
+    '''
+    Takes no args and returns no values
+    Displays visually the options for the player to choose the level they want to begin. 
+    It displays all unlocked levels as button options for the player to choose
+    '''
     app.roundOver = True
     back = Rect(0,0,width,height, fill='white')
     back.id = None
@@ -481,6 +544,10 @@ def level_select():
         selectionLabels.add(Label(i, ((width//h)*((i-3)%h)) + (width/2)//h, ((height/h)*((i-3)//h)) + (height/2)//h, size = ((width/2)// h)))
         
 def onMouseRelease(x,y):
+    '''
+    Built in CMU function which takes the coordinates of a mouse release as argument
+    Used in this game to force disc snaps and update values of game lists based on the snapping
+    '''
     app.absX = x
     app.absY = y
     for disc in allDiscs:
@@ -502,6 +569,10 @@ def onMouseRelease(x,y):
     update_stats()
 
 def onKeyPress(key):
+    '''
+    Built in CMU function which takes the value of a pressed key as argument
+    Used in this game to cancel the selection of a level in the level selection screen in case of an accidental press
+    '''
     if(key=='escape' and len(selectionLabels)>0):
         selectionLabels.clear()
         app.roundOver=False
