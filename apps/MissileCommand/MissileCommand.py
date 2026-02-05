@@ -814,6 +814,11 @@ def missiles_vs_anti_missiles():
                 explode_object(enemy, True)
                 if(app.muted == False):
                     Sound("../../libraries/Audio/uwexplosion.mp3").play(restart = True)
+                if(enemy.type == 'plane'):
+                    app.plane-=1
+                    if(app.plane<1):
+                        app.planeSound.play(restart = True)
+                        app.planeSound.pause()
                 points = enemy.score*app.mult*5
                 app.score+=points
                 create_scores(enemy.centerX, enemy.centerY, points)
