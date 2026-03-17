@@ -3,6 +3,14 @@ import sys
 import subprocess
 import zipfile
 import shutil
+from io import BytesIO
+import requests
+import time ## kill this one, only for debugging
+
+
+
+
+
 
 file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
@@ -10,6 +18,132 @@ os.chdir(directory_path)
 currentFile =  os.path.basename(__file__)
 rootPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 lib_path = os.path.join(rootPath, "libraries")
+
+github_version_file = "https://raw.githubusercontent.com/Jtrout5/ModernArcade/main/version.txt"
+repo_zip = "https://github.com/Jtrout5/ModernArcade/archive/refs/heads/main.zip"
+local_version_file = "../../version.txt"
+temp_dir = "_temp_update_dir"
+
+def get_local_version():
+    if not os.path.exists(local_version_file):
+        return "0.0.0"
+    with open(local_version_file, "r") as f:
+        return f.read().strip()
+
+def get_remote_version():
+    try:
+        r = requests.get(github_version_file, timeout=5)
+        return r.text.strip()
+    except:
+        return None
+
+def is_newer(remote, local):
+    def parse(v):
+        return tuple(map(int, v.split(".")))
+    return parse(remote) > parse(local)
+
+def download_and_update():
+    os.chdir("../../..")
+
+    r = requests.get(repo_zip)
+    z = zipfile.ZipFile(BytesIO(r.content))
+
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
+
+    # Extract ZIP into temp
+    z.extractall(temp_dir)
+
+    # Find extracted folder (repo-main/)
+    extracted_root = None
+    for name in os.listdir(temp_dir):
+        path = os.path.join(temp_dir, name)
+        if os.path.isdir(path):
+            extracted_root = temp_dir+"/"+name
+            print(extracted_root)
+            break
+
+    # Create updater script
+    updater_script = os.path.join(".", "run_update.py")
+    with open(updater_script, "w") as f:
+        f.write(f"""
+import os
+import shutil
+import time
+import subprocess
+
+file_path = os.path.abspath(__file__)
+directory_path = os.path.dirname(file_path)
+os.chdir(directory_path)
+
+PROJECT_ROOT = "ModernArcade"
+TEMP_DIR = {"\""+temp_dir+"\""}
+EXTRACTED = {"\""+extracted_root+"\""}
+LAUNCHER = "ModernArcade/apps/PretendLauncher/PretendLauncher.py"
+
+time.sleep(1)
+
+# Delete everything in project root
+for item in os.listdir(PROJECT_ROOT):
+    if item in ["run_update.py", ".git"]:
+        continue
+    path = os.path.join(PROJECT_ROOT, item)
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    else:
+        os.remove(path)
+
+# Move new files into project root
+for item in os.listdir(EXTRACTED):
+    src = os.path.join(EXTRACTED, item)
+    dst = os.path.join(PROJECT_ROOT, item)
+    if os.path.isdir(src):
+        shutil.copytree(src, dst)
+    else:
+        shutil.copy2(src, dst)
+
+# Cleanup
+shutil.rmtree(TEMP_DIR)
+
+# Relaunch launcher
+subprocess.Popen(["python", os.path.join(PROJECT_ROOT, LAUNCHER)])
+
+# Delete updater script
+os.remove("run_update.py")
+""")
+
+    subprocess.Popen(["python", updater_script])
+    exit()
+
+
+def check_for_updates():
+    app.mode = 'checking'
+    local = get_local_version()
+    remote = get_remote_version()
+
+
+    if remote is None:
+        app.mode = 'selecting'
+
+    if is_newer(remote, local):
+        box = Rect(width/4, height/3, width/2, height/3, fill='white', border = 'cyan')
+        question = Label("A newer version is available, do you wish to update?", box.centerX, box.top + box.height/3, align = 'top', size = width/60)
+        app.updateButton = Rect(box.left, box.bottom, box.width/2, box.height/2, fill='green', align = 'bottom-left')
+        app.noUpdateButton = Rect(box.right, box.bottom, box.width/2, box.height/2, fill='red', align = 'bottom-right')
+        ans1 = Label("Yes", app.updateButton.centerX, app.updateButton.centerY, fill = 'white')
+        ans2 = Label("No", app.noUpdateButton.centerX, app.noUpdateButton.centerY, fill='white')
+        updateGUI.add(box, question, app.updateButton, app.noUpdateButton, ans1, ans2)
+        return ## delete this when ready to implement gui
+        #### Put the GUI for asking if new update is wanted
+        ##If Yes: download_and_update()
+        ##Else: Close menu
+    else:
+        app.mode = 'selecting'
+        return
+
+
+
 if lib_path not in sys.path:
     sys.path.insert(0, lib_path)
 
@@ -60,8 +194,10 @@ width = size[0]
 height = size[1]
 
 app.autofs = 0
-
+app.mode = "selecting"
 shownStats = Group()
+
+updateGUI = Group()
 
 app.width = width
 app.height = height
@@ -387,9 +523,16 @@ def onMousePress(x,y):
     if (escapeButton.contains(x,y)):
         sys.exit(0)
     for button in buttons:
-        if button.contains(x,y):
+        if (button.contains(x,y) and app.mode == 'selecting'):
             subprocess.Popen([sys.executable, button.game])
             sys.exit(0)
+    if(app.mode == 'checking'):
+        if(app.updateButton.contains(x,y)):
+            download_and_update()
+        elif(app.noUpdateButton.contains(x,y)):
+            updateGUI.clear()
+            app.mode = 'selecting'
+    
           
 def onMouseDrag(x,y):
     '''
@@ -458,9 +601,12 @@ def onStep(): ### Forces Full screen on mac
         pyautogui.press('f')
         pyautogui.keyUp("command")
         pyautogui.keyUp("ctrl")
+
     
 post_simple_stats()
 images.toFront()
 gameLabels.toFront()
+updateGUI.toFront()
+check_for_updates()
 
 app.run()
