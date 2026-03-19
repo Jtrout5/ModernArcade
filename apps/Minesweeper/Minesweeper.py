@@ -111,7 +111,6 @@ app.height = height
 
 app.setMaxShapeCount(100000)
 
-app.boom = Sound("../../libraries/Audio/nuke.mp3")
 app.stepsPerSecond = 30
 app.blocksWide = 0
 app.bombPercentage = 0
@@ -284,6 +283,8 @@ def create_bombs_end_game():
         if sq.bomb == True:
             bombs.add(Star(sq.centerX, sq.centerY, 1, 30, fill= 'red', border = 'yellow'))
             sq.bomb = False
+    if(app.muted == False):
+        Sound("../../libraries/Audio/nuke.mp3").play(restart = True)
 
 def plant_bombs(blocks):
     '''
@@ -688,7 +689,7 @@ def onKeyPress(key):
         toggle_flags_color()
     if((key == 'h' or key == 'H' or key =='p' or key =='P') and app.mode != None):
         toggle_help()
-    if(key == 'm' or 'M'):
+    if(key == 'm' or key == 'M'):
         toggle_mute()
 
 def clean_pre_game():
@@ -763,8 +764,6 @@ def onStep():
         pyautogui.keyUp("command")
         pyautogui.keyUp("ctrl")
     if(app.failed == True and app.mode!=None):
-        if(app.muted == False):
-            app.boom.play()
         explode_bombs()
     if(app.achShowing == True):
         app.removeAchTimer-=1
