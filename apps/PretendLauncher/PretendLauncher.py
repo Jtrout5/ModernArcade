@@ -5,12 +5,6 @@ import zipfile
 import shutil
 from io import BytesIO
 import requests
-import time ## kill this one, only for debugging
-
-
-
-
-
 
 file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
@@ -80,7 +74,7 @@ os.chdir(directory_path)
 PROJECT_ROOT = "ModernArcade"
 TEMP_DIR = {"\""+temp_dir+"\""}
 EXTRACTED = {"\""+extracted_root+"\""}
-LAUNCHER = "ModernArcade/apps/PretendLauncher/PretendLauncher.py"
+LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
 
 time.sleep(1)
 
