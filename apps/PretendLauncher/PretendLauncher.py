@@ -66,6 +66,7 @@ import os
 import shutil
 import time
 import subprocess
+import sys
 
 file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
