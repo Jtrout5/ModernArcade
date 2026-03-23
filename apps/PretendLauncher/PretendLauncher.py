@@ -101,13 +101,13 @@ for item in os.listdir(EXTRACTED):
 shutil.rmtree(TEMP_DIR)
 
 # Relaunch launcher
-subprocess.Popen(["python", os.path.join(PROJECT_ROOT, LAUNCHER)])
+subprocess.Popen([sys.executable, os.path.join(PROJECT_ROOT, LAUNCHER)])
 
 # Delete updater script
 os.remove("run_update.py")
 """)
 
-    subprocess.Popen(["python", updater_script])
+    subprocess.Popen([sys.executable, updater_script])
     exit()
 
 
