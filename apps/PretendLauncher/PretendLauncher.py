@@ -54,8 +54,7 @@ def download_and_update():
     for name in os.listdir(temp_dir):
         path = os.path.join(temp_dir, name)
         if os.path.isdir(path):
-            extracted_root = temp_dir+"/"+name
-            print(extracted_root)
+            extracted_root = os.path.join(temp_dir, name)
             break
 
     # Create updater script
@@ -73,13 +72,25 @@ directory_path = os.path.dirname(file_path)
 os.chdir(directory_path)
 
 PROJECT_ROOT = "ModernArcade"
-TEMP_DIR = {"\""+temp_dir+"\""}
-EXTRACTED = {"\""+extracted_root+"\""}
+TEMP_DIR = "{temp_dir}"
+EXTRACTED = "{extracted_root}"
 LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
 
 time.sleep(1)
 
-# Delete everything in project root
+preserved = {{}}
+
+games_root = os.path.join(PROJECT_ROOT, "apps")
+if os.path.exists(games_root):
+    for game in os.listdir(games_root):
+        game_path = os.path.join(games_root, game)
+        files_path = os.path.join(game_path, "Files")
+
+        if os.path.isdir(files_path):
+            temp_copy = os.path.join(TEMP_DIR, f"preserve_{{game}}")
+            shutil.copytree(files_path, temp_copy)
+            preserved[game] = temp_copy
+
 for item in os.listdir(PROJECT_ROOT):
     if item in ["run_update.py", ".git"]:
         continue
@@ -89,7 +100,6 @@ for item in os.listdir(PROJECT_ROOT):
     else:
         os.remove(path)
 
-# Move new files into project root
 for item in os.listdir(EXTRACTED):
     src = os.path.join(EXTRACTED, item)
     dst = os.path.join(PROJECT_ROOT, item)
@@ -98,19 +108,24 @@ for item in os.listdir(EXTRACTED):
     else:
         shutil.copy2(src, dst)
 
-# Cleanup
+for game, saved_path in preserved.items():
+    new_game_path = os.path.join(PROJECT_ROOT, "apps", game)
+    new_files_path = os.path.join(new_game_path, "Files")
+
+    if os.path.exists(new_game_path):
+        if os.path.exists(new_files_path):
+            shutil.rmtree(new_files_path)
+        shutil.copytree(saved_path, new_files_path)
+
 shutil.rmtree(TEMP_DIR)
 
-# Relaunch launcher
 subprocess.Popen([sys.executable, os.path.join(PROJECT_ROOT, LAUNCHER)])
 
-# Delete updater script
 os.remove("run_update.py")
 """)
 
     subprocess.Popen([sys.executable, updater_script])
     exit()
-
 
 def check_for_updates():
     app.mode = 'checking'
@@ -129,10 +144,7 @@ def check_for_updates():
         ans1 = Label("Yes", app.updateButton.centerX, app.updateButton.centerY, fill = 'white')
         ans2 = Label("No", app.noUpdateButton.centerX, app.noUpdateButton.centerY, fill='white')
         updateGUI.add(box, question, app.updateButton, app.noUpdateButton, ans1, ans2)
-        return ## delete this when ready to implement gui
-        #### Put the GUI for asking if new update is wanted
-        ##If Yes: download_and_update()
-        ##Else: Close menu
+        return 
     else:
         app.mode = 'selecting'
         return
