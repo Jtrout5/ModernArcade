@@ -46,10 +46,8 @@ def download_and_update():
         shutil.rmtree(temp_dir)
     os.makedirs(temp_dir)
 
-    # Extract ZIP into temp
     z.extractall(temp_dir)
 
-    # Find extracted folder (repo-main/)
     extracted_root = None
     for name in os.listdir(temp_dir):
         path = os.path.join(temp_dir, name)
@@ -57,7 +55,6 @@ def download_and_update():
             extracted_root = os.path.join(temp_dir, name)
             break
 
-    # Create updater script
     updater_script = os.path.join(".", "run_update.py")
     with open(updater_script, "w") as f:
         f.write(f"""
@@ -71,7 +68,7 @@ file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
 os.chdir(directory_path)
 
-PROJECT_ROOT = "ModernArcade"
+PROJECT_ROOT = directory_path
 TEMP_DIR = "{temp_dir}"
 EXTRACTED = "{extracted_root}"
 LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
