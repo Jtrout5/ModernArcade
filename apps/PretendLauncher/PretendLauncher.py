@@ -68,7 +68,7 @@ file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
 os.chdir(directory_path)
 
-PROJECT_ROOT = directory_path
+PROJECT_ROOT = "ModernArcade"
 TEMP_DIR = "{temp_dir}"
 EXTRACTED = "{extracted_root}"
 LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
