@@ -36,52 +36,29 @@ def is_newer(remote, local):
         return tuple(map(int, v.split(".")))
     return parse(remote) > parse(local)
 
-
-def find_project_root(start_path):
-    current = os.path.abspath(start_path)
-
-    while True:
-        if (
-            os.path.exists(os.path.join(current, "version.txt")) and
-            os.path.isdir(os.path.join(current, "apps"))
-        ):
-            return current
-
-        parent = os.path.dirname(current)
-        if parent == current:
-            raise Exception("Could not locate project root")
-
-        current = parent
-
-
 def download_and_update():
-    PROJECT_ROOT = find_project_root(os.path.dirname(__file__))
+    os.chdir("../../..")
 
     r = requests.get(repo_zip)
-    if r.status_code != 200:
-        raise Exception("Failed to download update")
-
     z = zipfile.ZipFile(BytesIO(r.content))
 
-    temp_dir = os.path.join(PROJECT_ROOT, temp_dir)
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
     os.makedirs(temp_dir)
 
+    # Extract ZIP into temp
     z.extractall(temp_dir)
 
+    # Find extracted folder (repo-main/)
     extracted_root = None
     for name in os.listdir(temp_dir):
         path = os.path.join(temp_dir, name)
         if os.path.isdir(path):
-            extracted_root = path
+            extracted_root = os.path.join(temp_dir, name)
             break
 
-    if not extracted_root or not os.listdir(extracted_root):
-        raise Exception("Extraction failed")
-
-    updater_script = os.path.join(PROJECT_ROOT, "run_update.py")
-
+    # Create updater script
+    updater_script = os.path.join(".", "run_update.py")
     with open(updater_script, "w") as f:
         f.write(f"""
 import os
@@ -90,107 +67,65 @@ import time
 import subprocess
 import sys
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-os.chdir(PROJECT_ROOT)
+file_path = os.path.abspath(__file__)
+directory_path = os.path.dirname(file_path)
+os.chdir(directory_path)
 
-TEMP_DIR = r"{temp_dir}"
-EXTRACTED = r"{extracted_root}"
-LAUNCHER = os.path.join("apps", "PretendLauncher", "PretendLauncher.py")
-BACKUP_DIR = PROJECT_ROOT + "_backup"
+PROJECT_ROOT = "ModernArcade"
+TEMP_DIR = "{temp_dir}"
+EXTRACTED = "{extracted_root}"
+LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
 
 time.sleep(1)
 
-if not os.path.exists(os.path.join(PROJECT_ROOT, "version.txt")):
-    sys.exit(1)
-
-if not os.path.isdir(os.path.join(PROJECT_ROOT, "apps")):
-    sys.exit(1)
-
 preserved = {{}}
-apps_dir = os.path.join(PROJECT_ROOT, "apps")
 
-for app in os.listdir(apps_dir):
-    app_path = os.path.join(apps_dir, app)
-    files_path = os.path.join(app_path, "Files")
+games_root = os.path.join(PROJECT_ROOT, "apps")
+if os.path.exists(games_root):
+    for game in os.listdir(games_root):
+        game_path = os.path.join(games_root, game)
+        files_path = os.path.join(game_path, "Files")
 
-    if os.path.isdir(files_path):
-        temp_copy = os.path.join(TEMP_DIR, f"preserve_{{app}}")
-        shutil.copytree(files_path, temp_copy)
-        preserved[app] = temp_copy
+        if os.path.isdir(files_path):
+            temp_copy = os.path.join(TEMP_DIR, f"preserve_{{game}}")
+            shutil.copytree(files_path, temp_copy)
+            preserved[game] = temp_copy
 
-try:
-    if os.path.exists(BACKUP_DIR):
-        shutil.rmtree(BACKUP_DIR)
+for item in os.listdir(PROJECT_ROOT):
+    if item in ["run_update.py", ".git"]:
+        continue
+    path = os.path.join(PROJECT_ROOT, item)
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    else:
+        os.remove(path)
 
-    shutil.copytree(PROJECT_ROOT, BACKUP_DIR, dirs_exist_ok=True)
+for item in os.listdir(EXTRACTED):
+    src = os.path.join(EXTRACTED, item)
+    dst = os.path.join(PROJECT_ROOT, item)
+    if os.path.isdir(src):
+        shutil.copytree(src, dst)
+    else:
+        shutil.copy2(src, dst)
 
-    for item in os.listdir(PROJECT_ROOT):
-        if item in ["run_update.py", os.path.basename(BACKUP_DIR)]:
-            continue
+for game, saved_path in preserved.items():
+    new_game_path = os.path.join(PROJECT_ROOT, "apps", game)
+    new_files_path = os.path.join(new_game_path, "Files")
 
-        path = os.path.join(PROJECT_ROOT, item)
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-        else:
-            os.remove(path)
+    if os.path.exists(new_game_path):
+        if os.path.exists(new_files_path):
+            shutil.rmtree(new_files_path)
+        shutil.copytree(saved_path, new_files_path)
 
-    for item in os.listdir(EXTRACTED):
-        src = os.path.join(EXTRACTED, item)
-        dst = os.path.join(PROJECT_ROOT, item)
+shutil.rmtree(TEMP_DIR)
 
-        if os.path.isdir(src):
-            shutil.copytree(src, dst)
-        else:
-            shutil.copy2(src, dst)
-
-    for app, saved_path in preserved.items():
-        new_app_path = os.path.join(PROJECT_ROOT, "apps", app)
-        new_files_path = os.path.join(new_app_path, "Files")
-
-        if os.path.exists(new_app_path):
-            if os.path.exists(new_files_path):
-                shutil.rmtree(new_files_path)
-
-            shutil.copytree(saved_path, new_files_path)
-
-    shutil.rmtree(TEMP_DIR)
-
-    subprocess.Popen([sys.executable, LAUNCHER])
-
-    shutil.rmtree(BACKUP_DIR)
-
-except Exception as e:
-
-    if os.path.exists(BACKUP_DIR):
-        for item in os.listdir(PROJECT_ROOT):
-            if item == "run_update.py":
-                continue
-
-            path = os.path.join(PROJECT_ROOT, item)
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-            else:
-                os.remove(path)
-
-        for item in os.listdir(BACKUP_DIR):
-            src = os.path.join(BACKUP_DIR, item)
-            dst = os.path.join(PROJECT_ROOT, item)
-
-            if os.path.isdir(src):
-                shutil.copytree(src, dst)
-            else:
-                shutil.copy2(src, dst)
-
-        shutil.rmtree(BACKUP_DIR)
-
-    sys.exit(1)
+subprocess.Popen([sys.executable, os.path.join(PROJECT_ROOT, LAUNCHER)])
 
 os.remove("run_update.py")
 """)
 
-    # --- Run updater and exit current process ---
     subprocess.Popen([sys.executable, updater_script])
-    sys.exit()
+    exit()
 
 def check_for_updates():
     app.mode = 'checking'
