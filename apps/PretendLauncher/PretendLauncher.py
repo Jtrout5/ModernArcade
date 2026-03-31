@@ -37,7 +37,7 @@ def is_newer(remote, local):
     return parse(remote) > parse(local)
 
 def download_and_update():
-    os.chdir("../../..")
+    os.chdir("../..")
 
     r = requests.get(repo_zip)
     z = zipfile.ZipFile(BytesIO(r.content))
@@ -48,14 +48,7 @@ def download_and_update():
 
     z.extractall(temp_dir)
 
-    extracted_root = None
-    for name in os.listdir(temp_dir):
-        path = os.path.join(temp_dir, name)
-        if os.path.isdir(path):
-            extracted_root = os.path.join(temp_dir, name)
-            break
-
-    updater_script = os.path.join(".", "run_update.py")
+    updater_script = "run_update.py"
     with open(updater_script, "w") as f:
         f.write(f"""
 import os
@@ -68,9 +61,9 @@ file_path = os.path.abspath(__file__)
 directory_path = os.path.dirname(file_path)
 os.chdir(directory_path)
 
-PROJECT_ROOT = "ModernArcade"
+PROJECT_ROOT = directory_path
 TEMP_DIR = "{temp_dir}"
-EXTRACTED = "{extracted_root}"
+EXTRACTED = directory_path + "/_temp_update_dir/ModernArcade-main"
 LAUNCHER = "apps/PretendLauncher/PretendLauncher.py"
 
 time.sleep(1)
@@ -89,7 +82,7 @@ if os.path.exists(games_root):
             preserved[game] = temp_copy
 
 for item in os.listdir(PROJECT_ROOT):
-    if item in ["run_update.py", ".git"]:
+    if item in ["run_update.py", ".git", "_temp_update_dir"]:
         continue
     path = os.path.join(PROJECT_ROOT, item)
     if os.path.isdir(path):
@@ -122,7 +115,7 @@ os.remove("run_update.py")
 """)
 
     subprocess.Popen([sys.executable, updater_script])
-    exit()
+    sys.exit(0)
 
 def check_for_updates():
     app.mode = 'checking'
