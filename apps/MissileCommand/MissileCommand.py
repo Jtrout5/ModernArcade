@@ -1269,7 +1269,7 @@ def fire_flak(building, xRange, yRange, lvl, src):
     flak will sometimes manage to save a city or a building but it is not powerful enough to rely heavily on
     Cities are no longer defenseless
     '''
-    rangeBoost = lvl if lvl < 125 else 125
+    rangeBoost = lvl if lvl < 250 else 250
     target = find_valuable_enemy(building.centerX, building.top, (((width/4)**2 + (height/4)**2)**0.5)+rangeBoost)
     if(target!=None):
         building.flakTimer = app.stepsPerSecond//target[4]
