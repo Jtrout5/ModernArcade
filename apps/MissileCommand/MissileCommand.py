@@ -171,6 +171,7 @@ flakShots = Group()
 flak = Group()
 score = Label("Score: %05d" %app.score, leftBattery.centerX, (1/40)*app.height, size = 20, fill='white')
 stage = Label("Level: %1d" %app.level, app.width*1/3 , (1/40)*app.height, size = 20, fill = 'white')
+bonus = Label("Bonus: 0", score.left, score.bottom+5, size = 20, fill='white', align = 'top-left')
 newLevelWarning = Label("Enemies until next level: %d" % app.enemiesLeftToSpawn, app.width * 2/3, (1/40)*app.height, size = 20, fill='white')
 hiscore = Label("High Score: %05d" %app.hiscore, rightBattery.centerX, (1/40)*app.height, size = 20, fill='white')
 
@@ -241,6 +242,16 @@ def make_all_cities_new_level():
             if not(i in cityids):
                 if(i<6):
                     cities.add(make_city(city_coords[i], i))
+    bonus.value = "Bonus: %d" %(app.cities - len(cities))
+
+def add_building_to_city(grp):
+    tall = randrange(5,80)
+    wide = randrange(4,15)
+    locX = randrange((int)(grp.left), (int)(grp.right))
+    building = Rect(locX-(wide/2), app.height-tall, wide, tall, border = 'white')
+    building.note = Sound("../../libraries/Audio/explosion.mp3")
+    building.flakTimer = randrange(app.stepsPerSecond, 3*app.stepsPerSecond)
+    grp.add(building)
 
 def reset():
     '''
@@ -316,6 +327,7 @@ def update_score():
     if (app.score>=app.gate):
         app.cities+=1
         app.gate*=2
+        bonus.value = "Bonus: %d" %(app.cities - len(cities))
         display_reward_extra_city()
         if(app.muted == False):
             Sound("../../libraries/Audio/eerie.mp3").play(restart = True)
@@ -543,7 +555,15 @@ def advance_stage():
     app.score+=len(cities)*25*app.mult
     app.level+=1
     for city in cities:
+        if(len(city)<18):
+            add_building_to_city(city)
+            city.health+=1
         city.level += 0.5
+        if(city.level<=2):
+            info.add(Label("City Level %d" %(city.level*2), city.centerX, city.centerY- 80, rotateAngle = -45, fill='white', size = 16))
+        else:
+            info.add(Label("Flak Level %d" %((city.level-2)*2), city.centerX, city.centerY- 80, rotateAngle = -45, fill="white", size = 16))
+    app.infoTimer = app.stepsPerSecond*4
     if(app.muted == False):
         Sound("../../libraries/Audio/levelup.mp3").play(restart = True)
     stage.value = "Level: %1d" %app.level
