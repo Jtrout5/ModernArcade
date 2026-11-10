@@ -45,23 +45,24 @@ def unzip_all(zip_file_path, destination_directory):
 try:
     from cmu_graphics import *
 except ImportError as e:
+    print("Graphics Package Not Installed, Now Downloading Automatically From Carnegie Mellon Release")
     zip_url = 'https://s3.amazonaws.com/cmu-cs-academy.lib.prod/desktop-cmu-graphics/cmu_graphics_installer.zip'  
     output_directory = "../../libraries"
     output_filename = "cmu_graphics_installer.zip"
     download_zip_file(zip_url, output_directory, output_filename)
+    print("Download Complete, Now Managing Library Installation")
     unzip_all(output_directory+'/cmu_graphics_installer.zip', output_directory)
+    print("Installation Complete, Now Cleaning Up Directory")
     shutil.move(output_directory+"/cmu_graphics_installer/cmu_graphics", "../../libraries")
     os.remove("../../libraries/"+output_filename)
     shutil.rmtree("../../libraries/cmu_graphics_installer")
+    print("Full Installation Process Complete, Now Launching")
     from cmu_graphics import *
 
 
 size = pyautogui.size()
 width = size[0]
 height = size[1]
-app.autofs = 0
-
-app.typeyTime = False
 
 app.width = width
 app.height = height
@@ -420,10 +421,9 @@ def onKeyPress(key):
     Built in CMU function which takes a pressed key as argument
     Used in this game to press the button matching the letter pressed
     '''
-    if(app.typeyTime == True):
-        for letter in letterLabels:
-            if key.lower() == letter.value:
-                onMousePress(letter.centerX, letter.centerY)
+    for letter in letterLabels:
+        if key.lower() == letter.value:
+            onMousePress(letter.centerX, letter.centerY)
 
 def win_round():
     '''
@@ -520,21 +520,5 @@ closeGameButton.words = Label("Close Game", closeGameButton.centerX, closeGameBu
 backToLauncher = Rect(pole.right, base.top, closeGameButton.width, closeGameButton.height, fill=None, border = 'gray', align = 'bottom-left')
 backToLauncher.game = "PretendLauncher/PretendLauncher.py"
 backToLauncher.words = Label("Return to Launcher", backToLauncher.centerX, backToLauncher.centerY, size = 15)
-
-def onStep():
-    '''
-    Built in CMU function with executes body code app.stepsPerSecond many times per second
-    Used in this function exclusively to force fullscreen on mac devices
-    '''
-    if(app.autofs<=2):
-        app.autofs += 1
-    if(app.autofs == 1):
-        pyautogui.keyDown("command")
-        pyautogui.keyDown('ctrl')
-        pyautogui.press('f')
-        pyautogui.keyUp("command")
-        pyautogui.keyUp("ctrl")
-    if(app.autofs ==2):
-        app.typeyTime = True
-
+app.enableFullscreen() #Forcing Fullscreen in a cleaner way in line with CMU Graphics Update
 app.run()

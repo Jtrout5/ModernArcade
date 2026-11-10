@@ -45,14 +45,18 @@ def unzip_all(zip_file_path, destination_directory):
 try:
     from cmu_graphics import *
 except ImportError as e:
+    print("Graphics Package Not Installed, Now Downloading Automatically From Carnegie Mellon Release")
     zip_url = 'https://s3.amazonaws.com/cmu-cs-academy.lib.prod/desktop-cmu-graphics/cmu_graphics_installer.zip'  
     output_directory = "../../libraries"
     output_filename = "cmu_graphics_installer.zip"
     download_zip_file(zip_url, output_directory, output_filename)
+    print("Download Complete, Now Managing Library Installation")
     unzip_all(output_directory+'/cmu_graphics_installer.zip', output_directory)
+    print("Installation Complete, Now Cleaning Up Directory")
     shutil.move(output_directory+"/cmu_graphics_installer/cmu_graphics", "../../libraries")
     os.remove("../../libraries/"+output_filename)
     shutil.rmtree("../../libraries/cmu_graphics_installer")
+    print("Full Installation Process Complete, Now Launching")
     from cmu_graphics import *
 
 
@@ -63,7 +67,6 @@ height = size[1]
 
 app.width = width
 app.height = height
-app.autofs = 0
 app.currentWord = ''
 app.level = 1
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
@@ -181,17 +184,6 @@ def onStep():
     Used in this game to spawn and move words, update score, check for losing status
     '''
     if(app.failed == False):
-        if(app.autofs<=6):
-            app.autofs +=1
-        if(app.autofs ==2):
-            pyautogui.keyDown("command")
-            pyautogui.keyDown("ctrl")
-            pyautogui.press('f')
-            pyautogui.keyUp("ctrl")
-            pyautogui.keyUp("command")
-        if(app.autofs==3):
-            app.currentWord = ''
-            app.yourWord.value = ''
         app.timer+=1
         if(app.timer%app.spawnTime == 0):
             num = app.level*3
@@ -313,4 +305,5 @@ def onMousePress(x,y):
 fullInfoList[3]+=1
 fullInfoList[4]+=1
 update_stats()
+app.enableFullscreen() #Forcing Fullsreen in a cleaner way in line with CMU graphics update
 app.run()

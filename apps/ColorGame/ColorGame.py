@@ -45,21 +45,24 @@ def unzip_all(zip_file_path, destination_directory):
 try:
     from cmu_graphics import *
 except ImportError as e:
+    print("Graphics Package Not Installed, Now Downloading Automatically From Carnegie Mellon Release")
     zip_url = 'https://s3.amazonaws.com/cmu-cs-academy.lib.prod/desktop-cmu-graphics/cmu_graphics_installer.zip'  
     output_directory = "../../libraries"
     output_filename = "cmu_graphics_installer.zip"
     download_zip_file(zip_url, output_directory, output_filename)
+    print("Download Complete, Now Managing Library Installation")
     unzip_all(output_directory+'/cmu_graphics_installer.zip', output_directory)
+    print("Installation Complete, Now Cleaning Up Directory")
     shutil.move(output_directory+"/cmu_graphics_installer/cmu_graphics", "../../libraries")
     os.remove("../../libraries/"+output_filename)
     shutil.rmtree("../../libraries/cmu_graphics_installer")
+    print("Full Installation Process Complete, Now Launching")
     from cmu_graphics import *
 
 
 size = pyautogui.size()
 width = size[0]
 height = size[1]
-app.autofs = 0
 
 
 app.width = width
@@ -274,14 +277,6 @@ def onStep():
     Built in CMU function which calls all of the body code app.stepsPerSecond many times per second
     Used in this script to descrement timeers and show scores
     '''
-    if(app.autofs<=1): ## Forces mac fullscreen
-        app.autofs += 1
-    if(app.autofs == 1):
-        pyautogui.keyDown("command")
-        pyautogui.keyDown('ctrl')
-        pyautogui.press('f')
-        pyautogui.keyUp("command")
-        pyautogui.keyUp("ctrl")
     if(app.failed == False):
         check_time()
         app.time -= 1
@@ -298,4 +293,5 @@ fullInfoList[1]+=1
 gameOver.toFront()
 leaving.toFront()
 
+app.enableFullscreen() # Forcing fullscreen in a cleaner way in line with update to CMU graphics
 app.run()

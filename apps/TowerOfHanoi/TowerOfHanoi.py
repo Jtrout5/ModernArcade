@@ -48,14 +48,18 @@ def unzip_all(zip_file_path, destination_directory):
 try:
     from cmu_graphics import *
 except ImportError as e:
+    print("Graphics Package Not Installed, Now Downloading Automatically From Carnegie Mellon Release")
     zip_url = 'https://s3.amazonaws.com/cmu-cs-academy.lib.prod/desktop-cmu-graphics/cmu_graphics_installer.zip'  
     output_directory = "../../libraries"
     output_filename = "cmu_graphics_installer.zip"
     download_zip_file(zip_url, output_directory, output_filename)
+    print("Download Complete, Now Managing Library Installation")
     unzip_all(output_directory+'/cmu_graphics_installer.zip', output_directory)
+    print("Installation Complete, Now Cleaning Up Directory")
     shutil.move(output_directory+"/cmu_graphics_installer/cmu_graphics", "../../libraries")
     os.remove("../../libraries/"+output_filename)
     shutil.rmtree("../../libraries/cmu_graphics_installer")
+    print("Full Installation Process Complete, Now Launching")
     from cmu_graphics import *
 
 size = pyautogui.size()
@@ -66,7 +70,6 @@ app.height = height
 app.moveCount = 0
 
 app.setMaxShapeCount(100000000)
-app.autofs = 0
 app.maxSize = (0.3)*width
 app.minSize = (1/40)*width
 
@@ -176,14 +179,6 @@ def onStep():
     All code in this body is executed app.stepsPerSecond many times every second
     Used to show motion in this project
     '''
-    if(app.autofs<=5):
-        app.autofs += 1
-    if(app.autofs == 4):
-        pyautogui.keyDown("command")
-        pyautogui.keyDown('ctrl')
-        pyautogui.press('f')
-        pyautogui.keyUp("command")
-        pyautogui.keyUp("ctrl")
     for ring in allDiscs:
         if(ring.canMove == True):
             ring.centerX, ring.centerY = (app.absX, app.absY)
@@ -582,5 +577,5 @@ selectScreen.toFront()
 selectionLabels.toFront()
 start_level()
 
-
+app.enableFullscreen() #Forces Fullscreen in a cleaner way in line with CMU graphics update
 app.run()

@@ -45,14 +45,18 @@ def unzip_all(zip_file_path, destination_directory):
 try:
     from cmu_graphics import *
 except ImportError as e:
+    print("Graphics Package Not Installed, Now Downloading Automatically From Carnegie Mellon Release")
     zip_url = 'https://s3.amazonaws.com/cmu-cs-academy.lib.prod/desktop-cmu-graphics/cmu_graphics_installer.zip'  
     output_directory = "../../libraries"
     output_filename = "cmu_graphics_installer.zip"
     download_zip_file(zip_url, output_directory, output_filename)
+    print("Download Complete, Now Managing Library Installation")
     unzip_all(output_directory+'/cmu_graphics_installer.zip', output_directory)
+    print("Installation Complete, Now Cleaning Up Directory")
     shutil.move(output_directory+"/cmu_graphics_installer/cmu_graphics", "../../libraries")
     os.remove("../../libraries/"+output_filename)
     shutil.rmtree("../../libraries/cmu_graphics_installer")
+    print("Full Installation Process Complete, Now Launching")
     from cmu_graphics import *
 
 
@@ -64,7 +68,6 @@ default = [0,0,0]
 keys = ["HighScore", "GamesPlayed", "TimesLaunched"] 
 fullInfoList = []
 
-app.autofs = 0
 
 def file_checking(path, default):
     '''
@@ -254,14 +257,6 @@ def onStep():
     Built in CMU function which calls body code app.stepsPerSecond many times every second
     Used to create the motion and highlighting/unhighlighting of the buttons
     '''
-    if(app.autofs<=1):
-        app.autofs += 1
-    if(app.autofs == 1):
-        pyautogui.keyDown("command")
-        pyautogui.keyDown('ctrl')
-        pyautogui.press('f')
-        pyautogui.keyUp("command")
-        pyautogui.keyUp("ctrl")
     if(app.failed == False):
         if(app.playerSelectionTimer<=0):
             end_round_fail()
@@ -346,6 +341,6 @@ order_game.append(colors[randrange(4)])
 fullInfoList[1]+=1
 fullInfoList[2]+=1
 update_stats()
-
+app.enableFullscreen() #Forcing Fullscreen in a cleaner way in line with CMU graphics update
 app.run()
 
